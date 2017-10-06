@@ -58,7 +58,7 @@ end
 
 def get_ns_service_type(cloud_service_type, service_type)
   case cloud_service_type
-  when "cloud.service.Netscaler" , "cloud.service.F5-bigip"
+  when "cloud.service.Netscaler" , "cloud.service.F5-bigip" , "cloud.service.oneops.1.Octavia"
 
     case service_type.upcase
     when "HTTPS"
@@ -136,7 +136,6 @@ listeners.each do |l|
     lb_name = [env_name, platform_name, cloud_dns_id, dns_zone].join(".") + '-'+vprotocol+"_"+vport+"tcp" +'-' + ci[:ciId].to_s + "-lb"
   end
 
-
   # elb 32char limit
   if cloud_service[:ciClassName] =~ /Elb/
     lb_name = [env_name,platform_name,ci[:ciId].to_s].join(".")
@@ -160,6 +159,7 @@ listeners.each do |l|
 
   dc_lb_name = [platform_name, env_name, asmb_name, org_name, dc_dns_zone].join(".") +
                '-'+vprotocol+"_"+vport+"tcp-" + platform[:ciId].to_s + "-lb"
+
   dc_lb = {
     :name => dc_lb_name,
     :iport => iport,
@@ -260,7 +260,7 @@ end
 
 node.set["loadbalancers"] = loadbalancers
 node.set["dcloadbalancers"] = dcloadbalancers
-node.set["cleanup_loadbalancers"] = cleanup_loadbalancers
+node.set["cleanup_loadbalancers"] = dcloadbalancers
 
 if cloud_service[:ciClassName] != ("cloud.service.Netscaler" || "cloud.service.F5-bigip")
   node.set["lb_name"] = [env_name, platform_name, ci[:ciId].to_s].join(".")
@@ -280,3 +280,6 @@ if containers.size >0
   Chef::Log.info("container based computes: #{computes.inspect}")
 end
 node.set['lb_members'] = computes
+Chef::Log.info("loadbalcners : #{loadbalancers}")
+Chef::Log.info("dc loadbalcners : #{dcloadbalancers}")
+Chef::Log.info("cleanup loadbalcners : #{dcloadbalancers}")

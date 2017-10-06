@@ -88,7 +88,7 @@ def get_connection
     Chef::Log.info("reusing connection")
     return
   end
-  
+
   cloud_name = node[:workorder][:cloud][:ciName]
   if node[:workorder][:services].has_key?(:lb)
     cloud_service = node[:workorder][:services][:lb][cloud_name][:ciAttributes]

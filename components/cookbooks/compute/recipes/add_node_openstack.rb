@@ -42,16 +42,16 @@ owner = node.workorder.payLoad.Assembly[0].ciAttributes["owner"] || "na"
 ostype = node.workorder.payLoad.os[0].ciAttributes["ostype"]
 
 #Baremetal condition
-additional_properties = JSON.parse(node.workorder.services.compute[cloud_name][:ciAttributes][:additional_properties])
-Chef::Log.info("additional_properties: #{additional_properties.inspect}")
+# additional_properties = JSON.parse(node.workorder.services.compute[cloud_name][:ciAttributes][:additional_properties])
+# Chef::Log.info("additional_properties: #{additional_properties.inspect}")
 
-if !additional_properties.nil? && !additional_properties.empty?
-  additional_properties.each_pair do |k,v|
-    if k.downcase =~/baremetal/ && v.downcase =~/true/
-        puts "***RESULT:is_baremetal=" "true"
-    end
-  end
-end
+# if !additional_properties.nil? && !additional_properties.empty?
+#   additional_properties.each_pair do |k,v|
+#     if k.downcase =~/baremetal/ && v.downcase =~/true/
+#         puts "***RESULT:is_baremetal=" "true"
+#     end
+#   end
+# end
 
 if compute_service.has_key?("initial_user") && !compute_service[:initial_user].empty?
   node.set["use_initial_user"] = true
