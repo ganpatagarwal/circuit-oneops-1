@@ -1,17 +1,3 @@
-require 'excon'
-
-def gen_conn(cloud_service,host)
-  encoded = Base64.encode64("#{cloud_service[:username]}:#{cloud_service[:password]}").gsub("\n","")
-  conn = Excon.new(
-      'https://'+host,
-      :headers => {
-          'Authorization' => "Basic #{encoded}",
-          'Content-Type' => 'application/x-www-form-urlencoded'
-      },
-      :ssl_verify_peer => false)
-  return conn
-end
-
 Chef::Log.info("Migrating loadbalancer")
 
 # Check if GSLB site id matches for new lb and old lb
@@ -47,37 +33,25 @@ if new_cloud_service[:ciAttributes][:gslb_site_dns_id] != old_cloud_service[:ciA
     and new lb service type : #{new_lb_service_type} .Please check your cloud configuration"
 end
 
-include_recipe "lb::build_load_balancers"
-
-if new_lb_service_type == 'lb'
-  az_map = JSON.parse(new_cloud_service[:ciAttributes][:availability_zones])
-  if node.workorder.has_key?("rfcCi") &&
-      node.workorder.rfcCi.ciAttributes.has_key?("availability_zone")
-
-    host_old = az_map[node.workorder.rfcCi.ciAttributes.availability_zone]
-    Chef::Log.info("previous netscaler: #{host_old}")
-    node.set["ns_conn_prev"] = gen_conn(new_cloud_service[:ciAttributes],host_old)
-  end
-end
-
 # Creating new loadbalancer
 Chef::Log.info("Creating New loadbalancer")
-node.set["rfcAction"] = "delete"
-include_recipe "lb::delete"
-node.set["rfcAction"] = "replace"
+node.set["workorder"]["rfcCi"]["ciAttributes"]["dns_record"] = nil
+node.set["rfcAction"] = "add"
 include_recipe "lb::add"
 
 # If creation is success , delete old loadbalancer
 Chef::Log.info("Deleting existing loadbalancer with servicetype: #{old_lb_service_type}")
 
 # Deleting old loadbalancer
+include_recipe "lb::build_load_balancers"
 
 case old_cloud_service[:ciClassName].split(".").last.downcase
   when /azure_lb/
+
     include_recipe "azure_lb::delete"
 
   when /netscaler/
-    # node.set["ns_conn"] = nil
+
     n = netscaler_connection "conn" do
       action :nothing
     end

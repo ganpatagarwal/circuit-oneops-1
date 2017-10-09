@@ -112,7 +112,6 @@ when /elb/
 end
 
 if lb_dns_name.nil? || lb_dns_name.empty?
-  Chef::Log.info("DNS : #{lb_dns_name}")
   Chef::Log.error("prevent empty dns_record - fail")
   exit 1
 end
