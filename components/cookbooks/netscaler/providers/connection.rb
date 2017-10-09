@@ -107,7 +107,7 @@ def get_connection
     ci = node.workorder.ci
     action = "action"
   end
-  
+
   az_orig = ci[:ciAttributes][:availability_zone] || ''
   az = ci[:ciAttributes][:availability_zone] || ''
   az_map = JSON.parse(cloud_service[:availability_zones])

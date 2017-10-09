@@ -62,6 +62,9 @@ end
 
 # Creating new loadbalancer
 Chef::Log.info("Creating New loadbalancer")
+node.set["rfcAction"] = "delete"
+include_recipe "lb::delete"
+node.set["rfcAction"] = "replace"
 include_recipe "lb::add"
 
 # If creation is success , delete old loadbalancer
@@ -74,7 +77,7 @@ case old_cloud_service[:ciClassName].split(".").last.downcase
     include_recipe "azure_lb::delete"
 
   when /netscaler/
-    node.set["ns_conn"] = nil
+    # node.set["ns_conn"] = nil
     n = netscaler_connection "conn" do
       action :nothing
     end
