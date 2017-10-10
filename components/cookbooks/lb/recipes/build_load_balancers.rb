@@ -58,7 +58,7 @@ end
 
 def get_ns_service_type(cloud_service_type, service_type)
   case cloud_service_type
-  when "cloud.service.Netscaler" , "cloud.service.F5-bigip"
+  when "cloud.service.Netscaler" , "cloud.service.F5-bigip" , "cloud.service.oneops.1.Octavia"
 
     case service_type.upcase
     when "HTTPS"
