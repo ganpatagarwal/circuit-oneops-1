@@ -22,10 +22,14 @@ old_lb_service_type= config_items_changed[:lb_service_type]
 Chef::Log.info("new lb service type value: " +lb_service_type.to_s)
 Chef::Log.info("old lb service type value: " +old_lb_service_type.to_s)
 
-if !config_items_changed.empty? && config_items_changed.has_key?("lb_service_type") && config_items_changed[:lb_service_type] != lb_service_type
+if !config_items_changed.empty? && config_items_changed.length == 1 && config_items_changed.has_key?("lb_service_type") && config_items_changed[:lb_service_type] != lb_service_type
 
   #migrate loadbalancer
   include_recipe "lb::migrate"
+
+elsif !config_items_changed.empty? && config_items_changed.length > 1 && config_items_changed.has_key?("lb_service_type")
+  Chef::Log.error("Detected changes in loadbalancer configuration alongwith request for migration. Migration can not be performed")
+  raise("Detected changes in loadbalancer configuration alongwith request for migration. Migration can not be performed")
 
 else
   # Normal loadbalncer update
