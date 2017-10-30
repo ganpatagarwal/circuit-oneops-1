@@ -20,51 +20,56 @@
     end
   end
 
-  def get_secrets_wo()
-    secrets = []
-    # get the certificate information information
-    certificate_attributes = node[:workorder][:rfcCi][:ciAttributes]
-    ciID = (node[:workorder][:rfcCi][:ciId]).to_s
-    cert_hash = {}
-    if !node[:workorder][:rfcCi][:ciAttributes][:cert].nil? && !node[:workorder][:rfcCi][:ciAttributes][:cert].empty?
-      cert_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:cert]
-      cert_hash[:secret_name] = ciID + "_certificate"
-      secrets.push(cert_hash)
-    else
-      raise "configuration error: certificate content is empty"
-    end
+   def get_secrets_wo()
+     secrets = []
+     # get the certificate information information
+     certificate_attributes = node[:workorder][:rfcCi][:ciAttributes]
+     ciID = (node[:workorder][:rfcCi][:ciId]).to_s
+     cert_hash = {}
+     if !node[:cert_content].nil? && !node[:cert_content].empty?
+       cert_hash[:content] = node[:cert_content]
+     elsif !node[:workorder][:rfcCi][:ciAttributes][:cert].nil? && !node[:workorder][:rfcCi][:ciAttributes][:cert].empty?
+       cert_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:cert]
+     else
+       raise "configuration error: certificate content is empty"
+     end
+     cert_hash[:secret_name] = ciID + "_certificate"
+     secrets.push(cert_hash)
 
-    chain_hash = {}
-    if !node[:workorder][:rfcCi][:ciAttributes][:cacertkey].nil? && !node[:workorder][:rfcCi][:ciAttributes][:cacertkey].empty?
-      chain_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:cacertkey]
-      chain_hash[:secret_name] = ciID + "_intermediates"
-      secrets.push(chain_hash)
-    else
-      raise "configuration error: intermediate certificate chain is empty"
-    end
+     chain_hash = {}
+     if !node[:ca_content].nil? && !node[:ca_content].empty?
+       chain_hash[:content] = node[:ca_content]
+     elsif !node[:workorder][:rfcCi][:ciAttributes][:cacertkey].nil? && !node[:workorder][:rfcCi][:ciAttributes][:cacertkey].empty?
+       chain_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:cacertkey]
+     else
+       raise "configuration error: intermediate certificate chain is empty"
+     end
+     chain_hash[:secret_name] = ciID + "_intermediates"
+     secrets.push(chain_hash)
 
+     key_hash = {}
+     if !node[:key_content].nil? && !node[:key_content].empty?
+       key_hash[:content] = node[:key_content]
+     elsif !node[:workorder][:rfcCi][:ciAttributes][:key].nil? && !node[:workorder][:rfcCi][:ciAttributes][:key].empty?
+       key_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:key]
+     else
+       raise "configuration error: private key is empty"
+     end
+     key_hash[:secret_name] = ciID +"_privatekey"
+     secrets.push(key_hash)
 
-    key_hash = {}
-    if !node[:workorder][:rfcCi][:ciAttributes][:key].nil? && !node[:workorder][:rfcCi][:ciAttributes][:key].empty?
-      key_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:key]
-      key_hash[:secret_name] = ciID +"_privatekey"
-      secrets.push(key_hash)
-    else
-      raise "configuration error: private key is empty"
-    end
+     passphrase_hash = {}
+     if !node[:workorder][:rfcCi][:ciAttributes][:passphrase].nil? && !node[:workorder][:rfcCi][:ciAttributes][:passphrase].empty?
+       passphrase_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:passphrase]
+       passphrase_hash[:secret_name] = ciID + "_privatekey_passphrase"
+       secrets.push(passphrase_hash)
+     end
 
-    passphrase_hash = {}
-    if !node[:workorder][:rfcCi][:ciAttributes][:passphrase].nil? && !node[:workorder][:rfcCi][:ciAttributes][:passphrase].empty?
-     passphrase_hash[:content] = node[:workorder][:rfcCi][:ciAttributes][:passphrase]
-      passphrase_hash[:secret_name] = ciID + "_privatekey_passphrase"
-      secrets.push(passphrase_hash)
-    end
+     node.set["secrets_hash"] =  secrets
+     node.set["cert_container_name"] = ciID + "_tls_cert_container"
+     secrets
 
-    node.set["secrets_hash"] =  secrets
-    node.set["cert_container_name"] = ciID + "_tls_cert_container"
-    secrets
-
-  end
+   end
 
   def replace_acl(name, userlist, type)
 
