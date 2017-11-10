@@ -18,9 +18,9 @@ class MemberManager
 
   end
 
-  def delete_member(pool_id, member_id)
+  def delete_member(lb_id, pool_id, member_id)
     Chef::Log.info("deleting member from pool_id #{pool_id}")
-    return @member_dao.delete_member(pool_id, member_id)
+    return @member_dao.delete_member(lb_id, pool_id, member_id)
   end
 
   def get_members(pool_id)

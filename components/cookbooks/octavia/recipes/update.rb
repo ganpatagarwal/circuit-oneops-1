@@ -257,7 +257,7 @@ begin
           end
           if is_member_still_exist == false
             Chef::Log.info("this compute with ip #{member.ip_address} is removed , so removing the member")
-            member_manager.delete_member(listener.pool.id, member.id)
+            member_manager.delete_member(new_lb.id, listener.pool.id, member.id)
           end
         end
         end

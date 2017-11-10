@@ -42,11 +42,11 @@ class MemberDao
   end
 
 
-  def delete_member(pool_id, member_id)
+  def delete_member(loadbalancer_id, pool_id, member_id)
     fail ArgumentError, 'pool_id is nil' if pool_id.nil? || pool_id.empty?
     fail ArgumentError, 'member id is nil' if member_id.nil?
 
-    response = @member_request.delete_lbaas_member(pool_id, member_id)
+    response = @member_request.wait(loadbalancer_id).delete_lbaas_member(pool_id, member_id)
     return response[:'status'] == 204 || response[:'status'] == 404 ? true : false
 
   end
