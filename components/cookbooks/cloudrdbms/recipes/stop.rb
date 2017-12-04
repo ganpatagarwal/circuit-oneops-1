@@ -45,6 +45,7 @@ ruby_block 'validate_complete' do
             elsif ( status == "RUNNING" ) || ( status == "ENQUEUED" )
               curlComplete = 0
               curlAttempt += 1
+              log "CloudRDBMS attempt #{curlAttempt} of 360, current status is #{status}."
               sleep(10)
             elsif ( status == "FINISHED" )
               curlComplete = 1

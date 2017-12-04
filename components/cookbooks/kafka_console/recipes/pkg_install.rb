@@ -89,26 +89,6 @@ execute 'install kafka-manager' do
   command "rpm -i #{kafka_manager_rpm}"
 end
 
-# remove ganglia-web
-execute "remove ganglia-web" do
-  user "root"
-  exists = <<-EOF
-  rpm -qa | grep 'ganglia-web*'
-  EOF
-  command "rpm -e $(rpm -qa 'ganglia-web*')"
-  only_if exists, :user => "root"
-end
-
-# remove ganglia-gmond, ganglia-gmetad, ganglia,
-execute "remove ganglia*" do
-  user "root"
-  exists = <<-EOF
-  rpm -qa | grep 'ganglia*'
-  EOF
-  command "rpm -e $(rpm -qa 'ganglia*')"
-  only_if exists, :user => "root"
-end
-
 # remove php-gd.x86_64
 execute "remove php-gd.x86_64" do
   user "root"
@@ -137,91 +117,6 @@ execute "remove libconfuse" do
   EOF
   command "rpm -e $(rpm -qa 'libconfuse')"
   only_if exists, :user => "root"
-end
-
-# remove rrdtool
-execute "remove rrdtool" do
-  user "root"
-  exists = <<-EOF
-  rpm -qa | grep 'rrdtool'
-  EOF
-  command "rpm -e $(rpm -qa 'rrdtool')"
-  only_if exists, :user => "root"
-end
-
-# install libconfuse.x86_64, rrdtool.x86_64, php-ZendFramework, php-gd.x86_64
-if ["redhat", "centos", "fedora"].include?(node["platform"])
-  yum_package "libconfuse.x86_64" do
-    action :install
-  end
-  
-  yum_package "rrdtool.x86_64" do
-    action :install
-  end
-  
-  yum_package "php-ZendFramework" do
-    action :install
-  end
-  
-  yum_package "php-gd.x86_64" do
-    action :install
-  end
-else
-  Chef::Log.error("we currently support redhat, centos, fedora. You are using some OS other than those.")
-end
-
-# download ganglia
-ganglia_rpm = node['kafka_console']['ganglia']['filename']
-ganglia_download = base_url + "#{ganglia_rpm}"
-
-remote_file ::File.join(Chef::Config[:file_cache_path], "#{ganglia_rpm}") do
-  owner "root"
-  mode "0644"
-  source ganglia_download
-  action :create
-end
-
-# install ganglia
-execute 'install ganglia' do
-  user "root"
-  cwd Chef::Config[:file_cache_path]
-  command "rpm -i #{ganglia_rpm}"
-end
-
-# download gmond
-gmond_rpm = node['kafka_console']['gmond']['filename']
-gmond_download = base_url + "#{gmond_rpm}"
-
-remote_file ::File.join(Chef::Config[:file_cache_path], "#{gmond_rpm}") do
-  owner "root"
-  mode "0644"
-  source gmond_download
-  action :create
-end
-
-# install gmond
-execute 'install gmond' do
-  user "root"
-  cwd Chef::Config[:file_cache_path]
-  command "rpm -i #{gmond_rpm}"
-end
-
-# download gmetad
-gmetad_rpm = node['kafka_console']['gmetad']['filename']
-gmetad_download = base_url + "#{gmetad_rpm}"
-
-remote_file ::File.join(Chef::Config[:file_cache_path], "#{gmetad_rpm}") do
-  owner "root"
-  mode "0644"
-  source gmetad_download
-  action :create
-end
-
-# install gmetad
-execute 'install gmetad' do
-  user "root"
-  cwd Chef::Config[:file_cache_path]
-  command "rpm -i #{gmetad_rpm}"
 end
 
 nginx_rpm = node['kafka_console']['nginx']['filename']

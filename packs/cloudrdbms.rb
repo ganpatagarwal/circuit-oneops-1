@@ -1,4 +1,3 @@
-
 #
 # Pack Name:: cloudrdbms
 # Maintainer:: GECCloudDB@email.wal-mart.com
@@ -120,11 +119,9 @@ resource "lb",
 :except => [ 'single' ],
 :design => false,
 :attributes => {
-    "listeners" => "[\"tcp 3306 tcp 3307\"]"
-    #"ecv_map"   => "{\"$OO_LOCAL{port}\":\"GET /\"}"
-}
-
-
+    "listeners"     => '["tcp 3306 tcp 3307"]',
+    "ecv_map"       => '{"3307":"port-check"}'
+  }
 
 # we use this to have the hostnames stay the same after a compute REPLACE:
 resource "hostname",
@@ -135,8 +132,6 @@ resource "hostname",
     :services => "dns",
     :help => "optional hostname dns entry"
   }
-
-
 
 # our main cookbook / Component
 resource 'cloudrdbms',
@@ -590,13 +585,13 @@ end
                    "execStrategy": "'+link[:strategy]+'",
                    "relationName": "manifest.Requires",
                    "direction": "from",
-                   "targetClassName": "manifest.walmartlabs.Cloudrdbms",
+                   "targetClassName": "manifest.oneops.Cloudrdbms",
                    "flow": [
                             {
                              "relationName": "base.RealizedAs",
                              "execStrategy": "'+link[:strategy]+'",
                              "direction": "from",
-                             "targetClassName": "bom.walmartlabs.Cloudrdbms",
+                             "targetClassName": "bom.oneops.Cloudrdbms",
                              "actions": [
                                          {
                                           "actionName": "'+link[:action]+'",

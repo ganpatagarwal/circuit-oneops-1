@@ -60,7 +60,6 @@ attribute 'managedserviceuser',
 :format => {
     :help => 'Cloud RDBMS Concord User',
     :category => '1.Global',
-    :order => 1,
     :editable => true,
     :order => 1
 }

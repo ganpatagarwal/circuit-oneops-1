@@ -182,6 +182,7 @@ attribute 'graphite_url',
     :format => {
         :help => 'External Graphite URL. A Graphtie cluster needs to be deployed and ready to use at this moment',
         :category => '4.Monitoring',
+        :filter => {'all' => {'visible' => 'monitoring_system:eq:true'}},
         :order => 2
 }
 
