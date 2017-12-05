@@ -1,5 +1,4 @@
 include_pack "genericlb"
-
 name "tomcat"
 owner "brett.bourquin@walmartlabs.com"
 description "Provides a Tomcat Servlet Container to deploy java web application workloads"

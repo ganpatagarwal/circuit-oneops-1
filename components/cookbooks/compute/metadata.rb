@@ -70,6 +70,8 @@ attribute 'availability_zone',
     :order => 6
   }
 
+
+
 attribute 'required_availability_zone',
   :description => "Required Availability Zone",
   :grouping => 'manifest',
@@ -102,6 +104,16 @@ attribute 'tags',
     :order => 9
   }
 
+attribute 'availability_zones',
+          :description => "Fault and Update Domains",
+          :grouping => 'bom',
+          :data_type => "hash",
+          :default => "{}",
+          :format => {
+              :help => 'Availability_Zones',
+              :category => '1.Identity',
+              :order => 10
+          }
 
 # state
 
