@@ -58,7 +58,7 @@ end
 execute 'install kafka' do
   user "root"
   cwd Chef::Config[:file_cache_path]
-  command "rpm -i #{kafka_rpm}"
+  command "rpm -i #{kafka_rpm} --force"
 end
 
 template "/usr/local/kafka/bin/kafka_status.sh" do
@@ -113,7 +113,7 @@ end
 execute 'install jmxtrans' do
   user "root"
   cwd Chef::Config[:file_cache_path]
-  command "rpm -i #{jmxtrans_rpm}"
+  command "rpm -i #{jmxtrans_rpm} --nodeps "
 end
 
 kafka_gem_rpm = node['kafka']['gem']['rpm']
@@ -141,7 +141,7 @@ end
 execute 'install kafka gem' do
   user "root"
   cwd Chef::Config[:file_cache_path]
-  command "rpm -i #{kafka_gem_rpm}"
+  command "rpm -i #{kafka_gem_rpm} --force"
 end
 
 bash "gem-install" do

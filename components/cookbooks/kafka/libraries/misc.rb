@@ -155,9 +155,10 @@ def get_server_id_and_internal_zookeeper_electors
   Chef::Log.info("broker version #{kafka_version}")
 
   # figure out zk connect string
+  zk_connect_url = Array.new
   zk_connect_url=`/bin/grep zookeeper.connect= /etc/kafka/server.properties | awk -F\= '{print $2}'`.strip
 
-  if zk_connect_url.to_a.empty?
+  if zk_connect_url.empty?
     zk_peers = Array.new
     if node.workorder.rfcCi.ciAttributes.use_external_zookeeper.eql?("false")
       zk_peers = zookeeper_electors.keys
@@ -198,8 +199,8 @@ def get_server_id_and_internal_zookeeper_electors
         brokerid = `/bin/grep broker.id "#{node['kafka']['data_dir']}/meta.properties" | awk -F\= '{print $2}'`.strip
       end
 
-      if brokerid.to_a.empty?
-        brokerid = (1000 + rand(2147482647)).to_a
+      if brokerid.empty?
+        brokerid = (1000 + rand(2147482647))
       end
       ret = zkClient.create(:path => "/host_brokerid_mappings/#{myhostname}", :data => "#{brokerid}")
 

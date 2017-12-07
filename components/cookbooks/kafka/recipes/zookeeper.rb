@@ -146,6 +146,7 @@ end
 # zookeeper service
 # To-do: implement rolling-restart zookeeper
 service "zookeeper" do
+  provider Chef::Provider::Service::Systemd
   action [:restart, :enable]
   supports :status => true, :restart => true,:stop => true, :start => true
   only_if { node.workorder.rfcCi.rfcAction == "add" || node.workorder.rfcCi.rfcAction == "replace" } 

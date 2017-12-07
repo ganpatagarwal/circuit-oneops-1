@@ -30,13 +30,15 @@ resource "os",
   
 resource 'compute',
          :cookbook => 'oneops.1.compute',
+         :requires => { "constraint" => "1..1", "services" => "compute,dns,*mirror" },
          :attributes => {'size' => 'L-MEM' }
          
 resource "os-console",
   :cookbook => "oneops.1.os",
   :design => true, 
+  :requires => { "constraint" => "1..1", "services" => "compute,dns,*ntp" },
   :attributes => { 
-       "ostype"  => "default-cloud",
+       "ostype"  => "centos-7.2",
        "limits" => '{"nofile": 16384}',
        "sysctl"  => '{"net.ipv4.tcp_mem":"3064416 4085888 6128832", "net.ipv4.tcp_rmem":"4096 1048576 16777216", "net.ipv4.tcp_wmem":"4096 1048576 16777216", "net.core.rmem_max":"16777216", "net.core.wmem_max":"16777216", "net.core.rmem_default":"1048576", "net.core.wmem_default":"1048576", "fs.file-max":"1048576"}',
              "dhclient"  => 'false' }
@@ -44,7 +46,7 @@ resource "os-console",
 resource 'compute-console',
   :design => true,
   :cookbook => 'oneops.1.compute',
-  :requires => { "constraint" => "1..1"},
+  :requires => { "constraint" => "1..1" , "services" => "compute,dns,*mirror" },
   :attributes => {'size' => 'L'},
   :payloads => {
     'linksto' => {
@@ -77,6 +79,24 @@ resource 'compute-console',
             ]
           }
         ]
+      }'
+    },
+    'os' => {
+      'description' => 'os',
+      'definition' => '{
+         "returnObject": false,
+         "returnRelation": false,
+         "relationName": "base.RealizedAs",
+         "direction": "to",
+         "targetClassName": "manifest.oneops.1.Compute",
+         "relations": [
+           { "returnObject": true,
+             "returnRelation": false,
+             "relationName": "manifest.DependsOn",
+             "direction": "to",
+             "targetClassName": "manifest.oneops.1.Os"
+           }
+         ]
       }'
     }
    }
@@ -149,7 +169,7 @@ resource "kafka",
 resource "kafka-console",
      :cookbook => "oneops.1.kafka_console",
 	 :design => true,
-	 :requires => {"constraint" => "1..1"},
+         :requires => {"constraint" => "1..1", "services" => "dns,*mirror"},
 	 :attributes => {
 	 },
      :payloads => {
@@ -240,11 +260,18 @@ resource 'java',
          :cookbook => 'oneops.1.java',
          :design => true,
          :requires => {
-             :constraint => '0..1',
+             :constraint => '1..1',
              :services => '*mirror',
              :help => 'Java Programming Language Environment'
          },
-         :attributes => {}
+         :attributes => {
+              :install_dir => "/usr/lib/jvm",
+              :jrejdk => "jdk",
+              :binpath => "",
+              :version => "8",
+              :sysdefault => "true",
+              :flavor => "oracle"
+          }
 
 resource "hostname",
         :cookbook => "oneops.1.fqdn",
@@ -355,7 +382,7 @@ resource "jolokia_proxy",
   :design => true,
   :requires => {
     "constraint" => "0..1",
-    :services => "mirror"
+    :services => "*mirror"
   },
   :attributes => {
     version => "0.1"
@@ -508,10 +535,16 @@ resource "java-console",
      :requires => {
         :constraint => "1..1",
         :help => "Java Programming Language Environment",
-        :services => 'mirror'
+        :services => '*mirror'
      },
      :attributes => {
-     }
+              :install_dir => "/usr/lib/jvm",
+              :jrejdk => "jdk",
+              :binpath => "",
+              :version => "8",
+              :sysdefault => "true",
+              :flavor => "oracle"
+          }
 
 resource "volume-console",
     :cookbook => "oneops.1.volume",

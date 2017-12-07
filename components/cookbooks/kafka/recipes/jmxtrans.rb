@@ -16,15 +16,10 @@ template "/etc/sysconfig/jmxtrans" do
 end
 
 monitoring_system = node.workorder.rfcCi.ciAttributes.monitoring_system
-
-case monitoring_system
-when "Graphite"
+if monitoring_system == 'true'
   graphite_host = get_graphite_host
   # write the conf file for Graphite reporter
   land_graphite_jmx_conf(graphite_host)
-else
-  Chef::Log.error(monitoring_system + " is not recognized")
-  exit 1
 end
 
 # jmxtrans service

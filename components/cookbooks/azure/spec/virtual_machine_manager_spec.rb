@@ -44,6 +44,12 @@ describe AzureCompute::VirtualMachineManager do
     )
   end
 
+  describe 'security group' do
+    it 'valid secgroup is retrieved from workoder' do
+      expect(@virtual_machine_manager.instance_variable_get(:@secgroup_name)).to eq('secgroup-125866-1')
+    end
+  end
+
   describe '# test create or update virtual machine' do
     before do
     allow( @virtual_machine_manager.compute_client).to receive_message_chain(:availability_sets, :get).and_return(@availability_set)

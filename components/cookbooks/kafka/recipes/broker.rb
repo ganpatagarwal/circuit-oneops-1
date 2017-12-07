@@ -217,6 +217,7 @@ if node.workorder.rfcCi.ciAttributes.restart_flavor.eql?("rolling")
 else
   service "kafka" do
     action [:restart, :enable]
+    provider Chef::Provider::Service::Systemd
     supports :status => true, :restart => true,:stop => true, :start => true
     only_if { node.workorder.rfcCi.rfcAction == "add" || node.workorder.rfcCi.rfcAction == "replace" } 
   end
