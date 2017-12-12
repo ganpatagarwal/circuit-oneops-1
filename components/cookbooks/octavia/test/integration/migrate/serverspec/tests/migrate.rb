@@ -41,12 +41,20 @@ describe 'loadbalancer migration' do
     old_lb_service_type = @spec_utils.get_old_lb_service_type()
     puts "Old LB Service Type : #{old_lb_service_type}"
     if old_lb_service_type == "slb"
-      lb_details = @spec_utils.get_loadbalancer_details()
-      expect(lb_details).to be_nil
+      service_lb_attributes = @spec_utils.get_service_metadata()
+      tenant = TenantModel.new(service_lb_attributes[:endpoint],service_lb_attributes[:tenant],
+                               service_lb_attributes[:username],service_lb_attributes[:password])
+
+      loadbalancer_request = LoadbalancerRequest.new(tenant)
+
+      @loadbalancer_dao = LoadbalancerDao.new(loadbalancer_request)
+      lb_name = @spec_utils.build_n_return_lb_name
+      lb_id = @loadbalancer_dao.get_loadbalancer_id(lb_name)
+
+      expect(lb_id).to be false
     elsif old_lb_service_type == "lb"
       lb_details = @spec_utils.get_ns_loadbalancer_details()
       expect(lb_details).to be false
-      #TODO : check with exisiting NS details
     end
 
   end
