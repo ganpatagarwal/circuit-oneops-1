@@ -29,3 +29,7 @@ suites:
     verifier:
       patterns:
       - test/integration/delete/serverspec/delete_spec.rb
+  - name: migrate
+    verifier:
+      patterns:
+      - test/integration/migrate/serverspec/migrate_spec.rb
